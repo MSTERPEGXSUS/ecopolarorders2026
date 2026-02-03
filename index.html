@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ecopolar Shop</title>
+  <style>
+    :root {
+      --green: #4CAF50;
+      --darkgreen: #2e7d32;
+      --dark: #1a1a1a;
+      --light: #f9fafb;
+      --accent: #ff9800;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--light);
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--green), var(--darkgreen));
+      color: white;
+      text-align: center;
+      padding: 4rem 1rem 5rem;
+    }
+    .logo {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: white;
+      border: 8px solid white;
+      box-shadow: var(--shadow);
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 2.8rem; margin-bottom: 0.4rem; }
+    .tagline { font-size: 1.4rem; opacity: 0.9; }
+
+    .cart-icon, .staff-btn {
+      position: fixed;
+      background: white;
+      border-radius: 50%;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .cart-icon {
+      top: 16px;
+      right: 16px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.6rem;
+    }
+    .staff-btn {
+      bottom: 16px;
+      right: 80px;
+      width: 120px;
+      height: 44px;
+      border-radius: 30px;
+      background: #555;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: bold;
+      padding: 0 1rem;
+    }
+    .cart-count {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.8rem;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    main { padding: 2rem 1rem; max-width: 1100px; margin: 0 auto; }
+    h2 { color: var(--green); text-align: center; margin: 2.5rem 0 1.5rem; font-size: 2.2rem; }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.25s;
+    }
+    .card:hover { transform: translateY(-6px); }
+
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      background: #f8fafc;
+      padding: 0.8rem;
+    }
+
+    .card h3 { margin: 0.8rem 0 0.3rem; font-size: 1.25rem; }
+    .price { font-size: 1.35rem; font-weight: bold; color: var(--darkgreen); margin: 0.4rem 0; }
+    .add-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      margin: 0.8rem 0;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .add-btn:hover { background: var(--darkgreen); }
+
+    /* Cart Modal */
+    #cart-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 480px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 1.8rem;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .close { position: absolute; top: 10px; right: 16px; font-size: 2.2rem; cursor: pointer; color: #888; }
+    .cart-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee; }
+    .cart-total { font-size: 1.3rem; font-weight: bold; text-align: right; margin: 1.5rem 0 1rem; }
+    #buy-now, #clear-cart {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 30px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #buy-now { background: var(--green); }
+    #buy-now:hover { background: var(--darkgreen); }
+    #clear-cart { background: #e74c3c; }
+    #clear-cart:hover { background: #c0392b; }
+
+    /* Staff Area */
+    #staff-area {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 800px;
+      box-shadow: var(--shadow);
+    }
+    .order-item {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid var(--green);
+    }
+    #clear-orders {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+    #clear-orders:hover { background: #c0392b; }
+
+    footer {
+      background: var(--dark);
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="ecopolar-logo.png" alt="Ecopolar Logo" class="logo">
+    <h1>Ecopolar</h1>
+    <p class="tagline">Cooler choices for a cooler Arctic</p>
+  </header>
+
+  <div class="cart-icon" onclick="openCart()">
+    🛒
+    <span class="cart-count" id="cart-count">0</span>
+  </div>
+
+  <button class="staff-btn" onclick="showStaffLogin()">Staff Area</button>
+
+  <main>
+    <h2>Our Products</h2>
+
+    <div class="products">
+
+      <div class="card">
+        <img src="bamboo-toothbrushes.jpg" alt="Eco bamboo toothbrushes">
+        <h3>Eco-Friendly Bamboo Toothbrushes</h3>
+        <div class="price">£3.00</div>
+        <button class="add-btn" data-id="toothbrush" data-name="Toothbrush" data-price="3.00">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="scratch-art-bookmarks.jpg" alt="Scratch-art bookmarks">
+        <h3>Scratch-Art Bookmarks</h3>
+        <div class="price">£2.50</div>
+        <button class="add-btn" data-id="scratch" data-name="Scratch-Art Bookmark" data-price="2.50">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="penguin-keyrings.jpg" alt="Penguin plushie keyrings">
+        <h3>Penguin Plushie Keyrings</h3>
+        <div class="price">£3.00</div>
+        <button class="add-btn" data-id="penguin" data-name="Penguin Keyring" data-price="3.00">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="polar-bear-stickers.jpg" alt="Polar bear stickers pack">
+        <h3>Polar Bear Stickers Pack</h3>
+        <div class="price">£0.50</div>
+        <button class="add-btn" data-id="stickers" data-name="Stickers Pack" data-price="0.50">Add to Cart</button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCart()">×</span>
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <div class="cart-total">Total: £<span id="cart-total">0.00</span></div>
+      <button id="buy-now" onclick="placeOrder()">Buy Now</button>
+      <button id="clear-cart" onclick="clearCart()">Clear Cart</button>
+    </div>
+  </div>
+
+  <!-- Staff Password Prompt -->
+  <div id="staff-login" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:2rem; border-radius:12px; max-width:400px; text-align:center;">
+      <h3>Staff Area</h3>
+      <input type="password" id="staff-pass" placeholder="Enter password" style="padding:0.8rem; width:100%; margin:1rem 0; border-radius:8px; border:1px solid #ccc;">
+      <button onclick="checkStaffPassword()" style="background:var(--green); color:white; border:none; padding:0.8rem 1.6rem; border-radius:30px; cursor:pointer;">Enter</button>
+      <button onclick="document.getElementById('staff-login').style.display='none'" style="margin-left:1rem; background:#ccc; padding:0.8rem 1.6rem; border:none; border-radius:30px; cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Staff Orders Dashboard -->
+  <div id="staff-area">
+    <h2>Orders Dashboard (Staff Only)</h2>
+    <div id="orders-list"></div>
+    <button id="clear-orders" onclick="clearAllOrders()">Clear All Orders</button>
+    <button onclick="document.getElementById('staff-area').style.display='none'" style="margin-top:1rem; background:#e74c3c; color:white; padding:0.8rem 1.6rem; border:none; border-radius:30px; cursor:pointer;">Close</button>
+  </div>
+
+  <footer>
+    <p>© 2026 Ecopolar – Every purchase helps polar bears</p>
+    <p>Partnered with Born Free • UN SDG 12</p>
+  </footer>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('ecopolarCart')) || [];
+    let orders = JSON.parse(localStorage.getItem('ecopolarOrders')) || [];
+    let orderCounter = orders.length > 0 ? Math.max(...orders.map(o => o.orderNumber || 0)) + 1 : 1;
+
+    const STAFF_PASSWORD = "ecopolar";
+
+    function saveCart() {
+      localStorage.setItem('ecopolarCart', JSON.stringify(cart));
+      document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.qty, 0);
+    }
+
+    function saveOrders() {
+      localStorage.setItem('ecopolarOrders', JSON.stringify(orders));
+    }
+
+    function addToCart(id, name, price) {
+      let item = cart.find(i => i.id === id);
+      if (item) item.qty++;
+      else cart.push({ id, name, price: parseFloat(price), qty: 1 });
+      saveCart();
+      alert(name + " added to cart!");
+    }
+
+    function openCart() {
+      const modal = document.getElementById('cart-modal');
+      const itemsDiv = document.getElementById('cart-items');
+      itemsDiv.innerHTML = '';
+
+      if (cart.length === 0) {
+        itemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+      } else {
+        cart.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'cart-item';
+          row.innerHTML = `
+            <span>${item.name} × ${item.qty}</span>
+            <span>£${(item.price * item.qty).toFixed(2)}</span>
+          `;
+          itemsDiv.appendChild(row);
+        });
+      }
+
+      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      document.getElementById('cart-total').textContent = total.toFixed(2);
+
+      modal.style.display = 'flex';
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').style.display = 'none';
+    }
+
+    function placeOrder() {
+      if (cart.length === 0) return alert("Cart is empty!");
+
+      const name = prompt("Enter your name for this order:");
+      if (!name || name.trim() === "") return alert("Order cancelled – name is required.");
+
+      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const order = {
+        orderNumber: orderCounter++,
+        name: name.trim(),
+        date: new Date().toLocaleString(),
+        items: [...cart],
+        total: total.toFixed(2)
+      };
+
+      orders.push(order);
+      saveOrders();
+
+      alert(`Order placed for ${name}!\nOrder #${order.orderNumber}\nTotal: £${total.toFixed(2)}\nThank you! 🐻‍❄️`);
+
+      cart = [];
+      saveCart();
+      closeCart();
+    }
+
+    function clearCart() {
+      if (confirm("Clear cart?")) {
+        cart = [];
+        saveCart();
+        closeCart();
+      }
+    }
+
+    function showStaffLogin() {
+      document.getElementById('staff-login').style.display = 'flex';
+    }
+
+    function checkStaffPassword() {
+      const pass = document.getElementById('staff-pass').value;
+      if (pass === STAFF_PASSWORD) {
+        document.getElementById('staff-login').style.display = 'none';
+        showOrders();
+      } else {
+        alert("Wrong password");
+      }
+    }
+
+    function showOrders() {
+      const area = document.getElementById('staff-area');
+      const list = document.getElementById('orders-list');
+      list.innerHTML = '';
+
+      if (orders.length === 0) {
+        list.innerHTML = '<p>No orders placed yet.</p>';
+      } else {
+        orders.forEach(order => {
+          const div = document.createElement('div');
+          div.className = 'order-item';
+          div.innerHTML = `
+            <strong>Order - ${order.name} (#${order.orderNumber})</strong> — ${order.date}<br>
+            <strong>Total:</strong> £${order.total}<br>
+            <strong>Items:</strong><br>
+            ${order.items.map(i => `• ${i.name} × ${i.qty} = £${(i.price * i.qty).toFixed(2)}`).join('<br>')}
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      area.style.display = 'block';
+    }
+
+    function clearAllOrders() {
+      if (confirm("Clear ALL orders? This cannot be undone.")) {
+        orders = [];
+        orderCounter = 1;
+        saveOrders();
+        showOrders();
+      }
+    }
+
+    // Attach events
+    document.querySelectorAll('.add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price);
+      });
+    });
+
+    // Load on start
+    saveCart();
+  </script>
+
+</body>
+</html>
