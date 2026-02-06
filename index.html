@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ecopolar – Eco Products for a Cooler Arctic</title>
+  <title>Ecopolar – Eco Products</title>
   <style>
     :root {
       --green: #4CAF50;
@@ -169,8 +169,8 @@
     #clear-cart { background: #e74c3c; }
     #clear-cart:hover { background: #c0392b; }
 
-    /* Reservation Modal */
-    #reservation-modal {
+    /* Reserve Stock Modal */
+    #reserve-modal {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.55);
@@ -179,7 +179,7 @@
       justify-content: center;
       z-index: 2000;
     }
-    .reservation-content {
+    .reserve-content {
       background: white;
       border-radius: 16px;
       width: 90%;
@@ -187,14 +187,14 @@
       padding: 2rem;
       position: relative;
     }
-    .reservation-content input, .reservation-content textarea, .reservation-content select {
+    .reserve-content input, .reserve-content textarea {
       width: 100%;
       padding: 0.8rem;
       margin: 0.6rem 0;
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-    #submit-reservation {
+    #submit-reserve {
       background: var(--green);
       color: white;
       border: none;
@@ -203,7 +203,7 @@
       cursor: pointer;
       margin-top: 1rem;
     }
-    #submit-reservation:hover { background: var(--darkgreen); }
+    #submit-reserve:hover { background: var(--darkgreen); }
 
     /* Staff Area */
     #staff-area {
@@ -243,15 +243,16 @@
       margin-top: 4rem;
     }
     footer button {
-      background: var(--accent);
+      background: var(--green);
       color: white;
       border: none;
       padding: 0.8rem 1.6rem;
       border-radius: 30px;
       cursor: pointer;
       margin-top: 1rem;
+      font-weight: 600;
     }
-    footer button:hover { background: #e68900; }
+    footer button:hover { background: var(--darkgreen); }
   </style>
 </head>
 <body>
@@ -267,38 +268,38 @@
     <span class="cart-count" id="cart-count">0</span>
   </div>
 
-  <button class="staff-btn" onclick="showStaffLogin()">Staff Area</button>
+  <button class="staff-btn" onclick="showStaffLogin()">Staff Login</button>
 
   <main>
     <h2>Our Products</h2>
 
     <div class="products">
       <div class="card">
-        <img src="bamboo-toothbrushes.jpg" alt="Eco bamboo toothbrushes">
+        <img src="bamboo-toothbrushes.jpg" alt="Eco bamboo toothbrush">
         <h3>Eco-Friendly Bamboo Toothbrush</h3>
         <div class="price">£3.00</div>
         <button class="add-btn" data-id="toothbrush" data-name="Toothbrush" data-price="3.00">Add to Cart</button>
       </div>
 
       <div class="card">
-        <img src="scratch-art-bookmarks.jpg" alt="Scratch-art bookmarks">
+        <img src="scratch-art-bookmarks.jpg" alt="Scratch-art bookmark">
         <h3>Scratch-Art Bookmark</h3>
         <div class="price">£2.50</div>
         <button class="add-btn" data-id="scratch" data-name="Scratch-Art Bookmark" data-price="2.50">Add to Cart</button>
       </div>
 
       <div class="card">
-        <img src="penguin-keyrings.jpg" alt="Penguin plushie keyrings">
+        <img src="penguin-keyrings.jpg" alt="Penguin plushie keyring">
         <h3>Penguin Plushie Keyring</h3>
         <div class="price">£1.00</div>
         <button class="add-btn" data-id="penguin" data-name="Penguin Keyring" data-price="1.00">Add to Cart</button>
       </div>
 
       <div class="card">
-        <img src="polar-bear-stickers.jpg" alt="Polar bear stickers pack">
-        <h3>Polar Bear Stickers </h3>
+        <img src="polar-bear-stickers.jpg" alt="Polar bear sticker">
+        <h3>Polar Bear Sticker</h3>
         <div class="price">£0.25</div>
-        <button class="add-btn" data-id="stickers" data-name="Stickers Pack" data-price="0.25">Add to Cart</button>
+        <button class="add-btn" data-id="sticker" data-name="Polar Bear Sticker" data-price="0.25">Add to Cart</button>
       </div>
     </div>
   </main>
@@ -324,22 +325,24 @@
     </div>
   </div>
 
-  <!-- Reservation Modal -->
-  <div id="reservation-modal">
-    <div class="reservation-content">
-      <span class="close" onclick="document.getElementById('reservation-modal').style.display='none'">×</span>
-      <h2>Make a Reservation</h2>
+  <!-- Reserve Stock Modal -->
+  <div id="reserve-modal">
+    <div class="reserve-content">
+      <span class="close" onclick="document.getElementById('reserve-modal').style.display='none'">×</span>
+      <h2>Reserve Stock</h2>
       <p style="font-size:0.95rem; color:#555; margin-bottom:1rem;">
-        Reservation fee: +£1 (added automatically).<br>
-        If you have a discount code, check the box below.
+        Reserve items so they don't run out.<br>
+        Fee: £1 (waived with discount code STAFFRESERVE).
       </p>
-      <input type="text" id="res-name" placeholder="Your Name" required>
-      <textarea id="res-notes" placeholder="Any special requests or notes..." rows="4"></textarea>
+      <input type="text" id="reserve-name" placeholder="Your Name" required>
+      <input type="text" id="reserve-products" placeholder="Products to reserve (e.g. 5 toothbrushes, 10 stickers)" required>
+      <input type="date" id="reserve-date" placeholder="Preferred pickup date" required>
+      <textarea id="reserve-notes" placeholder="Any notes or special requests..." rows="4"></textarea>
       <label style="display:block; margin:1rem 0 0.5rem;">
-        <input type="checkbox" id="res-discount-check"> I have a discount code
+        <input type="checkbox" id="reserve-discount-check"> I have discount code (STAFFRESERVE for no fee + 10% off cart)
       </label>
-      <input type="text" id="res-discount-code" placeholder="Enter discount code (optional)" style="display:none;">
-      <button id="submit-reservation" onclick="submitReservation()">Submit Reservation</button>
+      <input type="text" id="reserve-discount-code" placeholder="Enter discount code" style="display:none;">
+      <button id="submit-reserve" onclick="submitReserve()">Reserve Now</button>
     </div>
   </div>
 
@@ -364,7 +367,7 @@
   <footer>
     <p>© 2026 Ecopolar – Every purchase helps polar bears</p>
     <p>Partnered with Born Free • UN SDG 12</p>
-    <button onclick="document.getElementById('reservation-modal').style.display='flex'">Make a Reservation</button>
+    <button onclick="document.getElementById('reserve-modal').style.display='flex'">Reserve Stock</button>
   </footer>
 
   <script>
@@ -373,6 +376,7 @@
     let orderCounter = orders.length > 0 ? Math.max(...orders.map(o => o.orderNumber || 0)) + 1 : 1;
 
     const STAFF_PASSWORD = "ecopolar";
+    const DISCOUNT_CODE = "STAFFRESERVE"; // new code: no fee + 10% off cart
 
     function saveCart() {
       localStorage.setItem('ecopolarCart', JSON.stringify(cart));
@@ -513,47 +517,50 @@
       }
     }
 
-    function submitReservation() {
-      const name = document.getElementById('res-name').value.trim();
-      const notes = document.getElementById('res-notes').value.trim();
-      const discountChecked = document.getElementById('res-discount-check').checked;
-      const discountCode = document.getElementById('res-discount-code').value.trim();
+    function submitReserve() {
+      const name = document.getElementById('reserve-name').value.trim();
+      const products = document.getElementById('reserve-products').value.trim();
+      const date = document.getElementById('reserve-date').value;
+      const notes = document.getElementById('reserve-notes').value.trim();
+      const discountChecked = document.getElementById('reserve-discount-check').checked;
+      const discountCode = document.getElementById('reserve-discount-code').value.trim();
 
-      if (!name ||) {
+      if (!name || !products || !date) {
         alert("Please fill in all required fields.");
         return;
       }
 
       let subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
       let discount = 0;
-      if (discountChecked && discountCode) {
-        // Simple 10% discount if code entered
+      let fee = 1.00;
+
+      if (discountChecked && discountCode === DISCOUNT_CODE) {
         discount = subtotal * 0.10;
+        fee = 0.00; // no fee for discount code users
       }
 
-      const reservationFee = 1.00;
-      const final = subtotal - discount + reservationFee;
+      const final = subtotal - discount + fee;
 
-      let message = `Reservation submitted!\nName: ${name}\nDate: ${date}\nTime: ${time}\nPeople: ${people}\nNotes: ${notes}\n`;
+      let message = `Stock reserved!\nName: ${name}\nProducts: ${products}\nPickup date: ${date}\nNotes: ${notes}\n`;
       if (discount > 0) message += `Discount applied (10%): -£${discount.toFixed(2)}\n`;
-      message += `Reservation fee: +£1.00\nFinal total (if purchasing): £${final.toFixed(2)}\nWe'll confirm soon! 🐻‍❄️`;
+      message += `Reservation fee: £${fee.toFixed(2)}\n`;
+      message += `Total (if purchasing): £${final.toFixed(2)}\nWe'll hold it for you! 🐻‍❄️`;
 
       alert(message);
 
-      document.getElementById('reservation-modal').style.display = 'none';
-      document.getElementById('res-name').value = '';
-      document.getElementById('res-date').value = '';
-      document.getElementById('res-time').value = '';
-      document.getElementById('res-people').value = '';
-      document.getElementById('res-notes').value = '';
-      document.getElementById('res-discount-check').checked = false;
-      document.getElementById('res-discount-code').value = '';
-      document.getElementById('res-discount-code').style.display = 'none';
+      document.getElementById('reserve-modal').style.display = 'none';
+      document.getElementById('reserve-name').value = '';
+      document.getElementById('reserve-products').value = '';
+      document.getElementById('reserve-date').value = '';
+      document.getElementById('reserve-notes').value = '';
+      document.getElementById('reserve-discount-check').checked = false;
+      document.getElementById('reserve-discount-code').value = '';
+      document.getElementById('reserve-discount-code').style.display = 'none';
     }
 
     // Show/hide discount code field
-    document.getElementById('res-discount-check')?.addEventListener('change', function() {
-      document.getElementById('res-discount-code').style.display = this.checked ? 'block' : 'none';
+    document.getElementById('reserve-discount-check')?.addEventListener('change', function() {
+      document.getElementById('reserve-discount-code').style.display = this.checked ? 'block' : 'none';
     });
 
     // Attach events
