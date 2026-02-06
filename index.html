@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ecopolar Shop</title>
+  <title>Ecopolar – Eco Products for a Cooler Arctic</title>
   <style>
     :root {
       --green: #4CAF50;
-      --darkgreen: #2e7d32;
+      --dark-green: #2e7d32;
       --dark: #1a1a1a;
       --light: #f9fafb;
       --accent: #ff9800;
@@ -21,7 +21,7 @@
       line-height: 1.6;
     }
     header {
-      background: linear-gradient(135deg, var(--green), var(--darkgreen));
+      background: linear-gradient(135deg, var(--green), var(--dark-green));
       color: white;
       text-align: center;
       padding: 4rem 1rem 5rem;
@@ -39,7 +39,7 @@
     h1 { font-size: 2.8rem; margin-bottom: 0.4rem; }
     .tagline { font-size: 1.4rem; opacity: 0.9; }
 
-    .cart-icon, .staff-btn {
+    .cart-icon, .staff-btn, .reservation-btn {
       position: fixed;
       background: white;
       border-radius: 50%;
@@ -64,6 +64,18 @@
       height: 44px;
       border-radius: 30px;
       background: #555;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: bold;
+      padding: 0 1rem;
+    }
+    .reservation-btn {
+      bottom: 16px;
+      right: 210px;
+      width: 160px;
+      height: 44px;
+      border-radius: 30px;
+      background: var(--accent);
       color: white;
       font-size: 0.95rem;
       font-weight: bold;
@@ -112,7 +124,7 @@
     }
 
     .card h3 { margin: 0.8rem 0 0.3rem; font-size: 1.25rem; }
-    .price { font-size: 1.35rem; font-weight: bold; color: var(--darkgreen); margin: 0.4rem 0; }
+    .price { font-size: 1.35rem; font-weight: bold; color: var(--dark-green); margin: 0.4rem 0; }
     .add-btn {
       background: var(--green);
       color: white;
@@ -123,7 +135,7 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .add-btn:hover { background: var(--darkgreen); }
+    .add-btn:hover { background: var(--dark-green); }
 
     /* Cart Modal */
     #cart-modal {
@@ -149,6 +161,19 @@
     .close { position: absolute; top: 10px; right: 16px; font-size: 2.2rem; cursor: pointer; color: #888; }
     .cart-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee; }
     .cart-total { font-size: 1.3rem; font-weight: bold; text-align: right; margin: 1.5rem 0 1rem; }
+    #tip-section {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    #tip-input {
+      width: 100px;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
     #buy-now, #clear-cart {
       width: 100%;
       padding: 0.8rem;
@@ -160,11 +185,11 @@
       cursor: pointer;
     }
     #buy-now { background: var(--green); }
-    #buy-now:hover { background: var(--darkgreen); }
+    #buy-now:hover { background: var(--dark-green); }
     #clear-cart { background: #e74c3c; }
     #clear-cart:hover { background: #c0392b; }
 
-    /* Staff Area */
+    /* Staff Area – scrollable orders */
     #staff-area {
       display: none;
       background: white;
@@ -172,6 +197,8 @@
       padding: 2rem;
       margin: 2rem auto;
       max-width: 800px;
+      max-height: 85vh;
+      overflow-y: auto;
       box-shadow: var(--shadow);
     }
     .order-item {
@@ -192,6 +219,42 @@
     }
     #clear-orders:hover { background: #c0392b; }
 
+    /* Reservation Modal */
+    #reservation-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .reservation-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 480px;
+      padding: 2rem;
+      position: relative;
+    }
+    .reservation-content input, .reservation-content textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #submit-reservation {
+      background: var(--green);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    #submit-reservation:hover { background: var(--dark-green); }
+
     footer {
       background: var(--dark);
       color: white;
@@ -199,6 +262,16 @@
       padding: 2.5rem 1rem;
       margin-top: 4rem;
     }
+    footer button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    footer button:hover { background: #e68900; }
   </style>
 </head>
 <body>
@@ -259,8 +332,31 @@
       <h2>Your Cart</h2>
       <div id="cart-items"></div>
       <div class="cart-total">Total: £<span id="cart-total">0.00</span></div>
+
+      <!-- Tip Section -->
+      <div id="tip-section">
+        <label>Add Tip:</label><br>
+        <input type="number" id="tip-percent" placeholder="Tip %" min="0" max="100" style="width:80px; padding:0.5rem;">
+        <input type="number" id="tip-amount" placeholder="Or £" min="0" step="0.01" style="width:100px; padding:0.5rem;">
+        <p>Tip: £<span id="tip-value">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
+      </div>
+
       <button id="buy-now" onclick="placeOrder()">Buy Now</button>
       <button id="clear-cart" onclick="clearCart()">Clear Cart</button>
+    </div>
+  </div>
+
+  <!-- Reservation Modal -->
+  <div id="reservation-modal">
+    <div class="reservation-content">
+      <span class="close" onclick="document.getElementById('reservation-modal').style.display='none'">×</span>
+      <h2>Make a Reservation</h2>
+      <input type="text" id="res-name" placeholder="Your Name" required>
+      <input type="date" id="res-date" required>
+      <input type="time" id="res-time" required>
+      <input type="number" id="res-people" placeholder="Number of People" min="1" required>
+      <textarea id="res-notes" placeholder="Any special requests or notes..." rows="4"></textarea>
+      <button id="submit-reservation" onclick="submitReservation()">Submit Reservation</button>
     </div>
   </div>
 
@@ -274,10 +370,13 @@
     </div>
   </div>
 
-  <!-- Staff Orders Dashboard -->
+  <!-- Staff Orders Dashboard (now scrollable) -->
   <div id="staff-area">
     <h2>Orders Dashboard (Staff Only)</h2>
-    <div id="orders-list"></div>
+    <p style="color:#666; font-size:0.95rem; margin-bottom:1rem;">
+      Note: Orders are saved on this device only. For sync across multiple devices, you need a server/database (e.g. Firebase). LocalStorage is device-specific.
+    </p>
+    <div id="orders-list" style="max-height:400px; overflow-y:auto; padding-right:0.5rem;"></div>
     <button id="clear-orders" onclick="clearAllOrders()">Clear All Orders</button>
     <button onclick="document.getElementById('staff-area').style.display='none'" style="margin-top:1rem; background:#e74c3c; color:white; padding:0.8rem 1.6rem; border:none; border-radius:30px; cursor:pointer;">Close</button>
   </div>
@@ -285,6 +384,9 @@
   <footer>
     <p>© 2026 Ecopolar – Every purchase helps polar bears</p>
     <p>Partnered with Born Free • UN SDG 12</p>
+    <button onclick="document.getElementById('reservation-modal').style.display='flex'" style="margin-top:1rem; background:var(--accent); padding:0.8rem 1.6rem; border:none; border-radius:30px; cursor:pointer;">
+      Make a Reservation
+    </button>
   </footer>
 
   <script>
@@ -297,6 +399,7 @@
     function saveCart() {
       localStorage.setItem('ecopolarCart', JSON.stringify(cart));
       document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.qty, 0);
+      updateFinalTotal();
     }
 
     function saveOrders() {
@@ -332,12 +435,24 @@
 
       const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
       document.getElementById('cart-total').textContent = total.toFixed(2);
+      updateFinalTotal();
 
       modal.style.display = 'flex';
     }
 
     function closeCart() {
       document.getElementById('cart-modal').style.display = 'none';
+    }
+
+    function updateFinalTotal() {
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const tipPercent = parseFloat(document.getElementById('tip-percent')?.value) || 0;
+      const tipAmount = parseFloat(document.getElementById('tip-amount')?.value) || 0;
+      const tip = tipAmount > 0 ? tipAmount : (subtotal * tipPercent / 100);
+      const final = subtotal + tip;
+
+      document.getElementById('tip-value').textContent = tip.toFixed(2);
+      document.getElementById('final-total').textContent = final.toFixed(2);
     }
 
     function placeOrder() {
@@ -420,11 +535,39 @@
       }
     }
 
+    function submitReservation() {
+      const name = document.getElementById('res-name').value.trim();
+      const date = document.getElementById('res-date').value;
+      const time = document.getElementById('res-time').value;
+      const people = document.getElementById('res-people').value;
+      const notes = document.getElementById('res-notes').value.trim();
+
+      if (!name || !date || !time || !people) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      alert(`Reservation submitted!\nName: ${name}\nDate: ${date}\nTime: ${time}\nPeople: ${people}\nNotes: ${notes}\nWe'll contact you soon! 🐻‍❄️`);
+
+      document.getElementById('reservation-modal').style.display = 'none';
+      document.getElementById('res-name').value = '';
+      document.getElementById('res-date').value = '';
+      document.getElementById('res-time').value = '';
+      document.getElementById('res-people').value = '';
+      document.getElementById('res-notes').value = '';
+    }
+
     // Attach events
     document.querySelectorAll('.add-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price);
       });
+    });
+
+    // Tip listeners
+    ['tip-percent', 'tip-amount'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateFinalTotal);
     });
 
     // Load on start
