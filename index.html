@@ -152,33 +152,18 @@
     .close { position: absolute; top: 10px; right: 16px; font-size: 2.2rem; cursor: pointer; color: #888; }
     .cart-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee; }
     .cart-total { font-size: 1.3rem; font-weight: bold; text-align: right; margin: 1.5rem 0 0.5rem; }
-    #tip-section, #discount-section {
+    #donation-section {
       margin: 1rem 0;
       padding: 1rem;
       background: #f8f9fa;
       border-radius: 8px;
     }
-    #tip-percent, #tip-amount, #discount-code-input {
-      width: 150px;
+    #donation-amount {
+      width: 120px;
       padding: 0.5rem;
       margin: 0.5rem 0;
       border: 1px solid #ccc;
       border-radius: 6px;
-    }
-    #apply-discount-btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 30px;
-      cursor: pointer;
-      margin-left: 0.5rem;
-    }
-    #apply-discount-btn:hover { background: #e68900; }
-    #discount-message {
-      margin-top: 0.5rem;
-      color: #28a745;
-      font-weight: 600;
     }
     #final-total-line {
       font-size: 1.4rem;
@@ -225,9 +210,6 @@
       margin: 0.6rem 0;
       border: 1px solid #ccc;
       border-radius: 8px;
-    }
-    #reserve-discount-code {
-      margin-top: 1rem;
     }
     #submit-reserve {
       background: var(--green);
@@ -348,20 +330,11 @@
       <div id="cart-items"></div>
       <div class="cart-total">Subtotal: £<span id="cart-total">0.00</span></div>
 
-      <!-- Tip Section -->
-      <div id="tip-section">
-        <label>Add Tip:</label><br>
-        <input type="number" id="tip-percent" placeholder="Tip %" min="0" max="100" style="width:80px; padding:0.5rem;">
-        <input type="number" id="tip-amount" placeholder="Or £" min="0" step="0.01" style="width:100px; padding:0.5rem;">
-        <p>Tip: £<span id="tip-value">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
-      </div>
-
-      <!-- Discount Code Section -->
-      <div id="discount-section">
-        <label>Discount Code:</label><br>
-        <input type="text" id="discount-code-input" placeholder="Enter code (e.g. STAFFRESERVE)" style="width:220px; padding:0.5rem;">
-        <button id="apply-discount-btn" onclick="applyDiscount()">Apply</button>
-        <p id="discount-message" style="margin-top:0.5rem; color:#28a745; font-weight:600;"></p>
+      <!-- Donation Section -->
+      <div id="donation-section">
+        <label>Add Donation (for polar bears):</label><br>
+        <input type="number" id="donation-amount" placeholder="£0.00" min="0" step="0.01" style="width:120px; padding:0.5rem;">
+        <p>Donation: £<span id="donation-value">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
       </div>
 
       <button id="buy-now" onclick="placeOrder()">Buy Now</button>
@@ -376,13 +349,12 @@
       <h2>Reserve Stock</h2>
       <p style="font-size:0.95rem; color:#555; margin-bottom:1rem;">
         Reserve items so they don't run out.<br>
-        Fee: £1 (waived with code STAFFRESERVE).
+        Small holding fee: £1 (added automatically).
       </p>
       <input type="text" id="reserve-name" placeholder="Your Name" required>
       <input type="text" id="reserve-products" placeholder="Products to reserve (e.g. 5 toothbrushes, 10 stickers)" required>
       <textarea id="reserve-notes" placeholder="Any notes or special requests..." rows="4"></textarea>
-      <input type="text" id="reserve-discount-code" placeholder="Enter code (STAFFRESERVE for no fee + 10% off)" required>
-      <button id="submit-reserve" onclick="submitReserve()">Reserve Now</button>
+      <button id="submit-reserve" onclick="submitReserve()">Reserve Now (£1 Fee)</button>
     </div>
   </div>
 
@@ -407,24 +379,15 @@
   <footer>
     <p>© 2026 Ecopolar – Every purchase helps polar bears</p>
     <p>Partnered with Born Free • UN SDG 12</p>
-    <button onclick="document.getElementById('reserve-modal').style.display='flex'">Reserve Stock</button>
+    <button onclick="document.getElementById('reserve-modal').style.display='flex'">Reserve Stock (£1 Fee)</button>
   </footer>
 
   <script>
     let cart = JSON.parse(localStorage.getItem('ecopolarCart')) || [];
     let orders = JSON.parse(localStorage.getItem('ecopolarOrders')) || [];
     let orderCounter = orders.length > 0 ? Math.max(...orders.map(o => o.orderNumber || 0)) + 1 : 1;
-    let appliedDiscount = 0; // % discount from code
 
     const STAFF_PASSWORD = "ecopolar";
-    const DISCOUNT_CODES = {
-      "STAFFRESERVE": { discount: 0.10, noFee: true }, // 10% + no reservation fee
-      "FREEKEYRING": { freeItem: "Penguin Keyring" },
-      "FREESTICKER": { freeItem: "Polar Bear Sticker" },
-      "FREETOOTH": { freeItem: "Toothbrush" },
-      "FREEBMARK": { freeItem: "Scratch-Art Bookmark" },
-      "ECOFREE": { discount: 1.00 } // 100% off cart
-    };
 
     function saveCart() {
       localStorage.setItem('ecopolarCart', JSON.stringify(cart));
@@ -475,44 +438,12 @@
     }
 
     function updateFinalTotal() {
-      let subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-      const tipPercent = parseFloat(document.getElementById('tip-percent')?.value) || 0;
-      const tipAmount = parseFloat(document.getElementById('tip-amount')?.value) || 0;
-      const tip = tipAmount > 0 ? tipAmount : (subtotal * tipPercent / 100);
-      const discountAmount = subtotal * appliedDiscount;
-      const final = subtotal - discountAmount + tip;
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const donation = parseFloat(document.getElementById('donation-amount')?.value) || 0;
+      const final = subtotal + donation;
 
-      document.getElementById('tip-value').textContent = tip.toFixed(2);
+      document.getElementById('donation-value').textContent = donation.toFixed(2);
       document.getElementById('final-total').textContent = final.toFixed(2);
-    }
-
-    function applyDiscount() {
-      const codeInput = document.getElementById('discount-code-input').value.trim().toUpperCase();
-      if (!codeInput) {
-        alert("Enter a code first!");
-        return;
-      }
-
-      const codeData = DISCOUNT_CODES[codeInput];
-      if (codeData) {
-        if (codeData.freeItem) {
-          const item = cart.find(i => i.name === codeData.freeItem);
-          if (item) {
-            item.price = 0;
-            alert(`Free ${codeData.freeItem} applied!`);
-          } else {
-            alert(`You don't have ${codeData.freeItem} in your cart!`);
-            return;
-          }
-        } else {
-          appliedDiscount = codeData.discount;
-          alert(`Code ${codeInput} applied! ${appliedDiscount * 100}% off!`);
-        }
-        saveCart();
-        updateFinalTotal();
-      } else {
-        alert("Invalid code!");
-      }
     }
 
     function placeOrder() {
@@ -536,7 +467,6 @@
       alert(`Order placed for ${name}!\nOrder #${order.orderNumber}\nTotal: £${total.toFixed(2)}\nThank you! 🐻‍❄️`);
 
       cart = [];
-      appliedDiscount = 0;
       saveCart();
       closeCart();
     }
@@ -544,7 +474,6 @@
     function clearCart() {
       if (confirm("Clear cart?")) {
         cart = [];
-        appliedDiscount = 0;
         saveCart();
         closeCart();
       }
@@ -601,27 +530,16 @@
       const name = document.getElementById('reserve-name').value.trim();
       const products = document.getElementById('reserve-products').value.trim();
       const notes = document.getElementById('reserve-notes').value.trim();
-      const code = document.getElementById('reserve-discount-code').value.trim();
 
-      if (!name || !products || !code) {
-        alert("Please fill in all fields, including the code.");
+      if (!name || !products) {
+        alert("Please fill in your name and products to reserve.");
         return;
       }
 
-      if (code.toUpperCase() !== DISCOUNT_CODE) {
-        alert("Invalid code. Reservation failed.");
-        return;
-      }
-
-      // Code correct: no fee + discount
-      let subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-      let discount = subtotal * 0.10;
-      let fee = 0.00;
-      const final = subtotal - discount + fee;
-
+      const fee = 1.00;
       let message = `Stock reserved!\nName: ${name}\nProducts: ${products}\nNotes: ${notes}\n`;
-      message += `Discount applied (10%): -£${discount.toFixed(2)}\n`;
-      message += `No reservation fee!\nTotal (if purchasing): £${final.toFixed(2)}\nWe'll hold it for you! 🐻‍❄️`;
+      message += `Reservation fee: £${fee.toFixed(2)}\n`;
+      message += `We'll hold it for you! 🐻‍❄️`;
 
       alert(message);
 
@@ -629,7 +547,6 @@
       document.getElementById('reserve-name').value = '';
       document.getElementById('reserve-products').value = '';
       document.getElementById('reserve-notes').value = '';
-      document.getElementById('reserve-discount-code').value = '';
     }
 
     // Attach events
@@ -639,11 +556,9 @@
       });
     });
 
-    // Tip listeners
-    ['tip-percent', 'tip-amount'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', updateFinalTotal);
-    });
+    // Donation listener
+    const donationEl = document.getElementById('donation-amount');
+    if (donationEl) donationEl.addEventListener('input', updateFinalTotal);
 
     // Load on start
     saveCart();
