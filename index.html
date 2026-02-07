@@ -265,7 +265,7 @@
         <div class="price">£3.00</div>
         <div class="add-section">
           <button class="add-btn" data-id="toothbrush" data-name="Toothbrush" data-price="3.00">Add to Cart</button>
-          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="toothbrush"> Reserve instead</label>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="toothbrush"> Reserve (+£1)</label>
         </div>
       </div>
 
@@ -275,7 +275,7 @@
         <div class="price">£2.50</div>
         <div class="add-section">
           <button class="add-btn" data-id="scratch" data-name="Scratch-Art Bookmark" data-price="2.50">Add to Cart</button>
-          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="scratch"> Reserve instead</label>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="scratch"> Reserve (+£1)</label>
         </div>
       </div>
 
@@ -285,7 +285,7 @@
         <div class="price">£1.50</div>
         <div class="add-section">
           <button class="add-btn" data-id="penguin" data-name="Penguin Keyring" data-price="1.00">Add to Cart</button>
-          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="penguin"> Reserve instead</label>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="penguin"> Reserve (+£1)</label>
         </div>
       </div>
 
@@ -295,7 +295,7 @@
         <div class="price">£0.25</div>
         <div class="add-section">
           <button class="add-btn" data-id="sticker" data-name="Polar Bear Sticker" data-price="0.25">Add to Cart</button>
-          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="sticker"> Reserve instead</label>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="sticker"> Reserve (+£1)</label>
         </div>
       </div>
     </div>
@@ -319,7 +319,7 @@
       <div id="donation-section">
         <label>Add Donation (for polar bears):</label><br>
         <input type="number" id="donation-amount" placeholder="£0.00" min="0" step="0.01" style="width:120px; padding:0.5rem;">
-        <p>Donation: £<span id="donation-value">0.00</span> | Reservation Fee: £<span id="reservation-fee">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
+        <p>Donation: £<span id="donation-value">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
       </div>
 
       <button id="buy-now" onclick="placeOrder()">Complete Order</button>
@@ -356,6 +356,7 @@
     let orderCounter = orders.length > 0 ? Math.max(...orders.map(o => o.orderNumber || 0)) + 1 : 1;
 
     const STAFF_PASSWORD = "ecopolar";
+    const RESERVE_FEE = 1.00;
 
     function saveCart() {
       localStorage.setItem('ecopolarCart', JSON.stringify(cart));
@@ -367,10 +368,13 @@
       localStorage.setItem('ecopolarOrders', JSON.stringify(orders));
     }
 
-    function addToCart(id, name, price, isReserve = false) {
+    function addToCart(id, name, basePrice, isReserve = false) {
+      let price = parseFloat(basePrice);
+      if (isReserve) price += RESERVE_FEE;
+
       let item = cart.find(i => i.id === id && i.isReserve === isReserve);
       if (item) item.qty++;
-      else cart.push({ id, name, price: parseFloat(price), qty: 1, isReserve });
+      else cart.push({ id, name, price, qty: 1, isReserve, basePrice: parseFloat(basePrice) });
       saveCart();
       alert((isReserve ? "Reserved" : "Added") + " " + name + " to cart!");
     }
@@ -407,16 +411,13 @@
           row.className = 'cart-item';
           row.innerHTML = `
             <span>${item.name} × ${item.qty} (Reserved)</span>
-            <span>£0.00 (holding fee separate)</span>
+            <span>£${(item.price * item.qty).toFixed(2)} (incl. £${RESERVE_FEE.toFixed(2)} fee)</span>
           `;
           reservedDiv.appendChild(row);
         });
       }
 
-      const total = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
-      document.getElementById('cart-total').textContent = total.toFixed(2);
       updateFinalTotal();
-
       modal.style.display = 'flex';
     }
 
@@ -425,13 +426,11 @@
     }
 
     function updateFinalTotal() {
-      const subtotal = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
-      const reservationFee = cart.filter(i => i.isReserve).reduce((s, i) => s + i.qty * 1.00, 0);
+      let subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
       const donation = parseFloat(document.getElementById('donation-amount')?.value) || 0;
-      const final = subtotal + reservationFee + donation;
+      const final = subtotal + donation;
 
       document.getElementById('donation-value').textContent = donation.toFixed(2);
-      document.getElementById('reservation-fee').textContent = reservationFee.toFixed(2);
       document.getElementById('final-total').textContent = final.toFixed(2);
     }
 
@@ -441,24 +440,20 @@
       const name = prompt("Enter your name for this order:");
       if (!name || name.trim() === "") return alert("Order cancelled – name is required.");
 
-      const total = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
-      const reservationFee = cart.filter(i => i.isReserve).reduce((s, i) => s + i.qty * 1.00, 0);
+      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
       const order = {
         orderNumber: orderCounter++,
         name: name.trim(),
         date: new Date().toLocaleString(),
-        purchased: cart.filter(i => !i.isReserve),
-        reserved: cart.filter(i => i.isReserve),
-        total: total.toFixed(2),
-        reservationFee: reservationFee.toFixed(2)
+        items: [...cart],
+        total: total.toFixed(2)
       };
 
       orders.push(order);
       saveOrders();
 
       let message = `Order placed for ${name}!\nOrder #${order.orderNumber}\n`;
-      if (order.purchased.length > 0) message += `Purchased total: £${order.total}\n`;
-      if (order.reserved.length > 0) message += `Reserved items: ${order.reserved.length}, Holding fee: £${order.reservationFee}\n`;
+      message += `Total: £${order.total}\n`;
       message += `Thank you! 🐻‍❄️`;
 
       alert(message);
@@ -503,11 +498,9 @@
           div.className = 'order-item';
           div.innerHTML = `
             <strong>Order - ${order.name} (#${order.orderNumber})</strong> — ${order.date}<br>
-            <strong>Purchased Total:</strong> £${order.total}<br>
-            ${order.reserved.length > 0 ? `<strong>Reserved Items:</strong> ${order.reserved.length}, Fee: £${order.reservationFee}<br>` : ''}
+            <strong>Total:</strong> £${order.total}<br>
             <strong>Items:</strong><br>
-            ${order.purchased.map(i => `• ${i.name} × ${i.qty} = £${(i.price * i.qty).toFixed(2)}`).join('<br>')}
-            ${order.reserved.map(i => `• ${i.name} × ${i.qty} (Reserved)`).join('<br>')}
+            ${order.items.map(i => `• ${i.name} × ${i.qty} = £${(i.price * i.qty).toFixed(2)}${i.isReserve ? ' (Reserved, incl. fee)' : ''}`).join('<br>')}
           `;
           list.appendChild(div);
         });
