@@ -116,12 +116,25 @@
 
     .card h3 { margin: 0.8rem 0 0.3rem; font-size: 1.25rem; }
     .price { font-size: 1.35rem; font-weight: bold; color: var(--darkgreen); margin: 0.4rem 0; }
+    .add-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.8rem 0;
+    }
+    .reserve-check {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #555;
+    }
     .add-btn {
       background: var(--green);
       color: white;
       border: none;
       padding: 0.7rem 1.4rem;
-      margin: 0.8rem 0;
       border-radius: 30px;
       font-weight: 600;
       cursor: pointer;
@@ -152,6 +165,7 @@
     .close { position: absolute; top: 10px; right: 16px; font-size: 2.2rem; cursor: pointer; color: #888; }
     .cart-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee; }
     .cart-total { font-size: 1.3rem; font-weight: bold; text-align: right; margin: 1.5rem 0 0.5rem; }
+    .cart-section-title { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #555; }
     #donation-section {
       margin: 1rem 0;
       padding: 1rem;
@@ -185,42 +199,6 @@
     #buy-now:hover { background: var(--darkgreen); }
     #clear-cart { background: #e74c3c; }
     #clear-cart:hover { background: #c0392b; }
-
-    /* Reserve Stock Modal */
-    #reserve-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    .reserve-content {
-      background: white;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 480px;
-      padding: 2rem;
-      position: relative;
-    }
-    .reserve-content input, .reserve-content textarea {
-      width: 100%;
-      padding: 0.8rem;
-      margin: 0.6rem 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    #submit-reserve {
-      background: var(--green);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.6rem;
-      border-radius: 30px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    #submit-reserve:hover { background: var(--darkgreen); }
 
     /* Staff Area */
     #staff-area {
@@ -259,17 +237,6 @@
       padding: 2.5rem 1rem;
       margin-top: 4rem;
     }
-    footer button {
-      background: var(--green);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.6rem;
-      border-radius: 30px;
-      cursor: pointer;
-      margin-top: 1rem;
-      font-weight: 600;
-    }
-    footer button:hover { background: var(--darkgreen); }
   </style>
 </head>
 <body>
@@ -296,28 +263,40 @@
         <img src="bamboo-toothbrushes.jpg" alt="Eco bamboo toothbrush">
         <h3>Eco-Friendly Bamboo Toothbrush</h3>
         <div class="price">£3.00</div>
-        <button class="add-btn" data-id="toothbrush" data-name="Toothbrush" data-price="3.00">Add to Cart</button>
+        <div class="add-section">
+          <button class="add-btn" data-id="toothbrush" data-name="Toothbrush" data-price="3.00">Add to Cart</button>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="toothbrush"> Reserve instead</label>
+        </div>
       </div>
 
       <div class="card">
         <img src="scratch-art-bookmarks.jpg" alt="Scratch-art bookmark">
         <h3>Scratch-Art Bookmark</h3>
         <div class="price">£2.50</div>
-        <button class="add-btn" data-id="scratch" data-name="Scratch-Art Bookmark" data-price="2.50">Add to Cart</button>
+        <div class="add-section">
+          <button class="add-btn" data-id="scratch" data-name="Scratch-Art Bookmark" data-price="2.50">Add to Cart</button>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="scratch"> Reserve instead</label>
+        </div>
       </div>
 
       <div class="card">
         <img src="penguin-keyrings.jpg" alt="Penguin plushie keyring">
         <h3>Penguin Plushie Keyring</h3>
-        <div class="price">£1.00</div>
-        <button class="add-btn" data-id="penguin" data-name="Penguin Keyring" data-price="1.00">Add to Cart</button>
+        <div class="price">£1.50</div>
+        <div class="add-section">
+          <button class="add-btn" data-id="penguin" data-name="Penguin Keyring" data-price="1.00">Add to Cart</button>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="penguin"> Reserve instead</label>
+        </div>
       </div>
 
       <div class="card">
         <img src="polar-bear-stickers.jpg" alt="Polar bear sticker">
         <h3>Polar Bear Sticker</h3>
         <div class="price">£0.25</div>
-        <button class="add-btn" data-id="sticker" data-name="Polar Bear Sticker" data-price="0.25">Add to Cart</button>
+        <div class="add-section">
+          <button class="add-btn" data-id="sticker" data-name="Polar Bear Sticker" data-price="0.25">Add to Cart</button>
+          <label class="reserve-check"><input type="checkbox" class="reserve-checkbox" data-id="sticker"> Reserve instead</label>
+        </div>
       </div>
     </div>
   </main>
@@ -327,34 +306,24 @@
     <div class="modal-content">
       <span class="close" onclick="closeCart()">×</span>
       <h2>Your Cart</h2>
-      <div id="cart-items"></div>
+
+      <div class="cart-section-title">Purchased Items</div>
+      <div id="purchased-items"></div>
+
+      <div class="cart-section-title">Reserved Items</div>
+      <div id="reserved-items"></div>
+
       <div class="cart-total">Subtotal: £<span id="cart-total">0.00</span></div>
 
       <!-- Donation Section -->
       <div id="donation-section">
         <label>Add Donation (for polar bears):</label><br>
         <input type="number" id="donation-amount" placeholder="£0.00" min="0" step="0.01" style="width:120px; padding:0.5rem;">
-        <p>Donation: £<span id="donation-value">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
+        <p>Donation: £<span id="donation-value">0.00</span> | Reservation Fee: £<span id="reservation-fee">0.00</span> | Final Total: £<span id="final-total">0.00</span></p>
       </div>
 
-      <button id="buy-now" onclick="placeOrder()">Buy Now</button>
+      <button id="buy-now" onclick="placeOrder()">Complete Order</button>
       <button id="clear-cart" onclick="clearCart()">Clear Cart</button>
-    </div>
-  </div>
-
-  <!-- Reserve Stock Modal -->
-  <div id="reserve-modal">
-    <div class="reserve-content">
-      <span class="close" onclick="document.getElementById('reserve-modal').style.display='none'">×</span>
-      <h2>Reserve Stock</h2>
-      <p style="font-size:0.95rem; color:#555; margin-bottom:1rem;">
-        Reserve items so they don't run out.<br>
-        Small holding fee: £1 (added automatically).
-      </p>
-      <input type="text" id="reserve-name" placeholder="Your Name" required>
-      <input type="text" id="reserve-products" placeholder="Products to reserve (e.g. 5 toothbrushes, 10 stickers)" required>
-      <textarea id="reserve-notes" placeholder="Any notes or special requests..." rows="4"></textarea>
-      <button id="submit-reserve" onclick="submitReserve()">Reserve Now (£1 Fee)</button>
     </div>
   </div>
 
@@ -379,7 +348,6 @@
   <footer>
     <p>© 2026 Ecopolar – Every purchase helps polar bears</p>
     <p>Partnered with Born Free • UN SDG 12</p>
-    <button onclick="document.getElementById('reserve-modal').style.display='flex'">Reserve Stock (£1 Fee)</button>
   </footer>
 
   <script>
@@ -399,34 +367,53 @@
       localStorage.setItem('ecopolarOrders', JSON.stringify(orders));
     }
 
-    function addToCart(id, name, price) {
-      let item = cart.find(i => i.id === id);
+    function addToCart(id, name, price, isReserve = false) {
+      let item = cart.find(i => i.id === id && i.isReserve === isReserve);
       if (item) item.qty++;
-      else cart.push({ id, name, price: parseFloat(price), qty: 1 });
+      else cart.push({ id, name, price: parseFloat(price), qty: 1, isReserve });
       saveCart();
-      alert(name + " added to cart!");
+      alert((isReserve ? "Reserved" : "Added") + " " + name + " to cart!");
     }
 
     function openCart() {
       const modal = document.getElementById('cart-modal');
-      const itemsDiv = document.getElementById('cart-items');
-      itemsDiv.innerHTML = '';
+      const purchasedDiv = document.getElementById('purchased-items');
+      const reservedDiv = document.getElementById('reserved-items');
+      purchasedDiv.innerHTML = '';
+      reservedDiv.innerHTML = '';
 
-      if (cart.length === 0) {
-        itemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+      const purchased = cart.filter(i => !i.isReserve);
+      const reserved = cart.filter(i => i.isReserve);
+
+      if (purchased.length === 0) {
+        purchasedDiv.innerHTML = '<p>No purchased items.</p>';
       } else {
-        cart.forEach(item => {
+        purchased.forEach(item => {
           const row = document.createElement('div');
           row.className = 'cart-item';
           row.innerHTML = `
             <span>${item.name} × ${item.qty}</span>
             <span>£${(item.price * item.qty).toFixed(2)}</span>
           `;
-          itemsDiv.appendChild(row);
+          purchasedDiv.appendChild(row);
         });
       }
 
-      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      if (reserved.length === 0) {
+        reservedDiv.innerHTML = '<p>No reserved items.</p>';
+      } else {
+        reserved.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'cart-item';
+          row.innerHTML = `
+            <span>${item.name} × ${item.qty} (Reserved)</span>
+            <span>£0.00 (holding fee separate)</span>
+          `;
+          reservedDiv.appendChild(row);
+        });
+      }
+
+      const total = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
       document.getElementById('cart-total').textContent = total.toFixed(2);
       updateFinalTotal();
 
@@ -438,11 +425,13 @@
     }
 
     function updateFinalTotal() {
-      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const subtotal = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
+      const reservationFee = cart.filter(i => i.isReserve).reduce((s, i) => s + i.qty * 1.00, 0);
       const donation = parseFloat(document.getElementById('donation-amount')?.value) || 0;
-      const final = subtotal + donation;
+      const final = subtotal + reservationFee + donation;
 
       document.getElementById('donation-value').textContent = donation.toFixed(2);
+      document.getElementById('reservation-fee').textContent = reservationFee.toFixed(2);
       document.getElementById('final-total').textContent = final.toFixed(2);
     }
 
@@ -452,19 +441,27 @@
       const name = prompt("Enter your name for this order:");
       if (!name || name.trim() === "") return alert("Order cancelled – name is required.");
 
-      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const total = cart.reduce((s, i) => s + (i.isReserve ? 0 : i.price * i.qty), 0);
+      const reservationFee = cart.filter(i => i.isReserve).reduce((s, i) => s + i.qty * 1.00, 0);
       const order = {
         orderNumber: orderCounter++,
         name: name.trim(),
         date: new Date().toLocaleString(),
-        items: [...cart],
-        total: total.toFixed(2)
+        purchased: cart.filter(i => !i.isReserve),
+        reserved: cart.filter(i => i.isReserve),
+        total: total.toFixed(2),
+        reservationFee: reservationFee.toFixed(2)
       };
 
       orders.push(order);
       saveOrders();
 
-      alert(`Order placed for ${name}!\nOrder #${order.orderNumber}\nTotal: £${total.toFixed(2)}\nThank you! 🐻‍❄️`);
+      let message = `Order placed for ${name}!\nOrder #${order.orderNumber}\n`;
+      if (order.purchased.length > 0) message += `Purchased total: £${order.total}\n`;
+      if (order.reserved.length > 0) message += `Reserved items: ${order.reserved.length}, Holding fee: £${order.reservationFee}\n`;
+      message += `Thank you! 🐻‍❄️`;
+
+      alert(message);
 
       cart = [];
       saveCart();
@@ -506,9 +503,11 @@
           div.className = 'order-item';
           div.innerHTML = `
             <strong>Order - ${order.name} (#${order.orderNumber})</strong> — ${order.date}<br>
-            <strong>Total:</strong> £${order.total}<br>
+            <strong>Purchased Total:</strong> £${order.total}<br>
+            ${order.reserved.length > 0 ? `<strong>Reserved Items:</strong> ${order.reserved.length}, Fee: £${order.reservationFee}<br>` : ''}
             <strong>Items:</strong><br>
-            ${order.items.map(i => `• ${i.name} × ${i.qty} = £${(i.price * i.qty).toFixed(2)}`).join('<br>')}
+            ${order.purchased.map(i => `• ${i.name} × ${i.qty} = £${(i.price * i.qty).toFixed(2)}`).join('<br>')}
+            ${order.reserved.map(i => `• ${i.name} × ${i.qty} (Reserved)`).join('<br>')}
           `;
           list.appendChild(div);
         });
@@ -526,33 +525,12 @@
       }
     }
 
-    function submitReserve() {
-      const name = document.getElementById('reserve-name').value.trim();
-      const products = document.getElementById('reserve-products').value.trim();
-      const notes = document.getElementById('reserve-notes').value.trim();
-
-      if (!name || !products) {
-        alert("Please fill in your name and products to reserve.");
-        return;
-      }
-
-      const fee = 1.00;
-      let message = `Stock reserved!\nName: ${name}\nProducts: ${products}\nNotes: ${notes}\n`;
-      message += `Reservation fee: £${fee.toFixed(2)}\n`;
-      message += `We'll hold it for you! 🐻‍❄️`;
-
-      alert(message);
-
-      document.getElementById('reserve-modal').style.display = 'none';
-      document.getElementById('reserve-name').value = '';
-      document.getElementById('reserve-products').value = '';
-      document.getElementById('reserve-notes').value = '';
-    }
-
     // Attach events
     document.querySelectorAll('.add-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price);
+        const checkbox = document.querySelector(`.reserve-checkbox[data-id="${btn.dataset.id}"]`);
+        const isReserve = checkbox && checkbox.checked;
+        addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price, isReserve);
       });
     });
 
